@@ -60,7 +60,7 @@ void apply_input(double value)
     temperature += 0.01 * (rand() % 10) + 0.2 * value;
 }
 
-
+/* Run PID simulation */
 uint32_t pid_simulation(uint32_t iters, fpid_data_t *pid)
 {
     bool fan = false;
@@ -101,7 +101,7 @@ uint32_t pid_simulation(uint32_t iters, fpid_data_t *pid)
     return iters;
 }
 
-
+/* Run treshold simulation */
 void tres_simulation(uint32_t iters)
 {
     bool fan = false;
