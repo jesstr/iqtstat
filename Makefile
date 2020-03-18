@@ -4,6 +4,7 @@ TARGET = demo
 
 SRC = main.c
 SRC += fpid.c
+SRC += tres.c
 
 CC = gcc
 CFLAGS = -I.

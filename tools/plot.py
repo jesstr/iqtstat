@@ -10,7 +10,8 @@ plot_png = 'plot.png'
 
 
 def usage(name):
-    print('Usage: {} kP kI kD ref iters'.format(name) + '\r\n\
+    print('Usage: {} type [kP kI kD ref] iters'.format(name) + '\r\n\
+    type - {pid|tres} - Algorithm type\r\n\
     kP - Proportional (P) component\r\n\
     kI - Integrative (I) component\r\n\
     kD - Derivative (D) component\r\n\
@@ -23,38 +24,44 @@ def movavg(raw, window=30):
     return tuple((sum(extended[i:i + window]) / window) for i in range(0, len(raw)))
 
 def get_data_from_file(path):
-    data = tuple(zip(*tuple((float(f), float(r), float(h)) for f, r, h in map(lambda s: s.split('\t'), open(path).readlines()))))
+    data = tuple(zip(*tuple((float(f), float(r), float(h), float(i)) for f, r, h, i in map(lambda s: s.split('\t'), open(path).readlines()))))
     return data
 
 def get_data_from_stream(path):
     stream = os.popen(path)
-    data = tuple(zip(*tuple((float(f), float(r), float(h)) for f, r, h in map(lambda s: s.split('\t'), stream.readlines()))))
+    data = tuple(zip(*tuple((float(f), float(r), float(h), float(i)) for f, r, h, i in map(lambda s: s.split('\t'), stream.readlines()))))
     return data
 
 
 def main():
-    if len(sys.argv) != 6:
-        usage(sys.argv[0])
-        sys.exit(2)
-
-    for s in sys.argv[1:]:
+    for s in sys.argv[2:]:
         try:
             float(s)
         except:
             usage(sys.argv[0])
             sys.exit(2)
 
+    if sys.argv[1] == "pid":
+        if len(sys.argv) != 7:
+            usage(sys.argv[0])
+            sys.exit(2)
+
+    if sys.argv[1] == "tres":
+        if len(sys.argv) != 3:
+            usage(sys.argv[0])
+            sys.exit(2)
+
     bin_args = ' '.join(sys.argv[1:])
-    reference = float(sys.argv[4])
 
     dirname = os.path.split(os.path.abspath(__file__))[0]
     data = get_data_from_stream(dirname + '/' + bin_path + ' ' + bin_args)
 
     fig, ax = plt.subplots()
 
-    ax.axhline(reference, color='red', label='reference', linestyle='dashed', linewidth=.5)
-    ax.plot(data[2], color='orange', label='input')
     ax.plot(data[0], color='blue', label='temperature')
+    ax.plot(data[1], color='red', label='Tmin/Err')
+    ax.plot(data[2], color='green', label='Tmax/Ref')
+    ax.plot(data[3], color='orange', label='input')
 
     ax.set(xlabel='Time', ylabel='Temperature',
         title='PID demo')
