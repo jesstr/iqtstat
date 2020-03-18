@@ -3,7 +3,6 @@
 #define K_D     0.01
 
 #define PID_ERROR_LIMIT     (10.0)
-#include "options.h"
 #define PID_SUMERROR_LIMIT  (100.0)
 
 #define PID_MAX_INPUT       (1.0)
