@@ -24,12 +24,14 @@ def movavg(raw, window=30):
     return tuple((sum(extended[i:i + window]) / window) for i in range(0, len(raw)))
 
 def get_data_from_file(path):
-    data = tuple(zip(*tuple((float(f), float(r), float(h), float(i)) for f, r, h, i in map(lambda s: s.split('\t'), open(path).readlines()))))
+    data = tuple(zip(*tuple((float(m), float(e), float(r), float(i), float(f), float(h)) \
+        for m, e, r, i, f, h in map(lambda s: s.split('\t'), open(path).readlines()))))
     return data
 
 def get_data_from_stream(path):
     stream = os.popen(path)
-    data = tuple(zip(*tuple((float(f), float(r), float(h), float(i)) for f, r, h, i in map(lambda s: s.split('\t'), stream.readlines()))))
+    data = tuple(zip(*tuple((float(m), float(e), float(r), float(i), float(f), float(h)) \
+        for  m, e, r, i, f, h in map(lambda s: s.split('\t'), stream.readlines()))))
     return data
 
 
@@ -58,10 +60,12 @@ def main():
 
     fig, ax = plt.subplots()
 
-    ax.plot(data[0], color='blue', label='temperature')
+    ax.plot(data[0], color='blue', label='Temperature')
     ax.plot(data[1], color='red', label='Tmin/Err')
     ax.plot(data[2], color='green', label='Tmax/Ref')
-    ax.plot(data[3], color='orange', label='input')
+    ax.plot(data[3], color='orange', label='Input')
+    ax.plot(data[4], color='yellow', label='Fan')
+    ax.plot(data[5], color='purple', label='Heat')
 
     ax.set(xlabel='Time', ylabel='Temperature',
         title='PID demo')

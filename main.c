@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
-#include <time.h>
 
 #include "fpid.h"
 #include "tres.h"
+#include "stime.h"
+#include "relays.h"
 #include "options.h"
 
 #define DBG if(0)
@@ -61,6 +63,8 @@ void apply_input(double value)
 
 uint32_t pid_simulation(uint32_t iters, fpid_data_t *pid)
 {
+    bool fan = false;
+    bool heat = false;
     uint32_t count = 0;
 
     for (uint32_t i = 0; i < iters; i++) {
@@ -70,9 +74,12 @@ uint32_t pid_simulation(uint32_t iters, fpid_data_t *pid)
         /* PID magic goes here */
         double input = fpid_controller(ref, meas, pid);
 
+        /* Set heater & fan relays */
+        set_relays(input, &heat, &fan);
+
         /* Output data for plots */
         double err = ref - meas;
-        printf("%f\t%f\t%f\t%f\r\n", meas, err, ref, input);
+        printf("%f\t%f\t%f\t%f\t%i\t%i\r\n", meas, err, ref, input, fan, heat);
 
         /* Apply control input */
         apply_input(input);
@@ -86,6 +93,9 @@ uint32_t pid_simulation(uint32_t iters, fpid_data_t *pid)
         } else {
             count = 0;
         }
+
+        /* Emulate system time */
+        set_systick(i * 1000);
     }
 
     return iters;
@@ -94,6 +104,9 @@ uint32_t pid_simulation(uint32_t iters, fpid_data_t *pid)
 
 void tres_simulation(uint32_t iters)
 {
+    bool fan = false;
+    bool heat = false;
+
     for (uint32_t i = 0; i < iters; i++) {
         double meas = get_measurement();
         float tmin = settings.tmin;
@@ -103,11 +116,22 @@ void tres_simulation(uint32_t iters)
 
         int input = tres_controller(meas, tmax, tmax_hyst, tmin, tmin_hyst);
 
+        /* Set heater & fan relays */
+        set_relays(input, &heat, &fan);
+
         /* Output data for plots */
-        printf("%f\t%f\t%f\t%i\r\n", meas, tmin, tmax, input);
+        printf("%f\t%f\t%f\t%i\t%i\t%i\r\n", meas, tmin, tmax, input, fan, heat);
 
         /* Apply control input */
+        if (input > 0) {
+            input = heat;
+        } else if (input < 0) {
+            input = -fan;
+        }
         apply_input(input);
+
+        /* Emulate system time */
+        set_systick(i * 1000);
     }
 }
 
