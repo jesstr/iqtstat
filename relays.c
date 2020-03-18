@@ -5,13 +5,20 @@
 #include "stime.h"
 #include "options.h"
 
+
+uint16_t get_relay_timeout()
+{
+    return RELAY_TIMEOUT;
+}
+
 static bool set_heat(bool state)
 {
     static bool last_state;
     static time_t timestamp;
+    uint16_t timeout = get_relay_timeout();
 
     time_t ticks = get_systick();
-    if ((state != last_state && (ticks - timestamp) / 1000 > RELAY_TIMEOUT) ||
+    if ((state != last_state && (ticks - timestamp) / 1000 > timeout) ||
             timestamp == 0) {
         last_state = state;
         timestamp = ticks;
@@ -25,9 +32,10 @@ static bool set_fan(bool state)
 {
     static bool last_state;
     static time_t timestamp;
+    uint16_t timeout = get_relay_timeout();
 
     time_t ticks = get_systick();
-    if ((state != last_state && (ticks - timestamp) / 1000 > RELAY_TIMEOUT) ||
+    if ((state != last_state && (ticks - timestamp) / 1000 > timeout) ||
             timestamp == 0) {
         last_state = state;
         timestamp = ticks;
