@@ -1,12 +1,13 @@
-# Simple PID simulation
+# Temperature control simulation
 
 Build: *make*
 
-Usage: *./tools/plot.py kP kI kD ref iters*
+Usage: *./tools/plot.py type [kP kI kD ref] iters*
 
-    kP - Proportional (P) component
-    kI - Integrative (I) component
-    kD - Derivative (D) component
+    type - {pid|tres} - Algorithm type: PID or Treshold
+    kP - Proportional (P) component (PID only)
+    kI - Integrative (I) component (PID only)
+    kD - Derivative (D) component (PID only)
     ref - Reference temperature value
     iters - Max number of PID iterations
 
