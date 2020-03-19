@@ -7,6 +7,7 @@ SRC += fpid.c
 SRC += tres.c
 SRC += relays.c
 SRC += stime.c
+SRC += matlab.c
 
 CC = gcc
 CFLAGS = -I.
